@@ -1,5 +1,5 @@
 console.log("hello world");
-
+// localStorage.clear();
 const inputName = document.getElementById('inputName');
 const inputAge = document.getElementById('inputAge');
 const inputDOB = document.getElementById('inputDOB');
@@ -11,12 +11,13 @@ const inputSchool = document.getElementById('inputSchool');
 const inputAddress = document.getElementById('inputAddress');
 const inputContact = document.getElementById('inputContact');
 const cardDetail = document.getElementById("card-detail");
+const formheader = document.getElementById("form-header");
 
 const form = document.getElementById('form');
 const div = document.getElementById("container");
 const submit = document.getElementById("submit-btn");
 
-// Populate div elements with stored form data when the page loads
+
 window.addEventListener('load', () => {
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
@@ -25,7 +26,7 @@ window.addEventListener('load', () => {
     }
 });
 
-// Function to create a div element from form data
+
 function createDivFromData(formData) {
     const divEle = document.createElement('div');
     divEle.classList.add("container", "border", "mb-2", "d-flex");
@@ -65,17 +66,23 @@ function createDivFromData(formData) {
           </ul>
           <div class="card-body">
             <button type="button" class="btn btn-primary btn-sm">
-              Download
+              Delete
             </button>
-            <a href="#" class="card-link">Another link</a>
           </div>`
         divEle2.innerHTML = ele2;
         cardDetail.appendChild(divEle2);
+        const delButton = divEle2.querySelector('button');
+        delButton.addEventListener('click', ()=>{
+          localStorage.removeItem(key);
+          location.reload();
+        })
     });
 }
 
 submit.addEventListener('click', (event) => {
-    event.preventDefault(); // Prevent the default form submission behavior
+  if (!validateForm()) {
+    event.preventDefault(); // Prevent form submission
+}else{
     const id = Date.now();
     const formData = {
         id,
@@ -91,5 +98,23 @@ submit.addEventListener('click', (event) => {
         contact: inputContact.value
     };
     localStorage.setItem(id, JSON.stringify(formData));
-    createDivFromData(formData); // Create a new div based on the submitted form data
+    createDivFromData(formData); 
+    formheader.remove();
+  }
 });
+function validateForm() {
+  // Get all required input elements
+  const requiredInputs = form.querySelectorAll('[required]');
+  
+  // Loop through each required input
+  for (const input of requiredInputs) {
+      // Check if the input value is empty
+      if (input.value.trim() === '') {
+          alert('Please fill in all required fields.');
+          return false; // Prevent form submission
+      }
+  }
+  return true; // Allow form submission
+}
+
+
